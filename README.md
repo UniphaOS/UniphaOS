@@ -18,8 +18,10 @@ sudo apt install -y build-essential gcc-multilib nasm qemu-system-x86 ovmf git
 ├── src/
 │   ├── boot.c      # UEFI Bootloader
 │   └── main.c      # Kernel Entry Point
+├── .gitignore      # Git ignore list
+├── LICENSE         # MIT license
 ├── Makefile        # Build and emulation scripts
-└── README.md       # Project documentation
+└── README.md       # Project document
 ```
 
 ## How to Build and Run
