@@ -1,16 +1,20 @@
-CC = x86_64-w64-mingw32-gcc
-CFLAGS = -Wall -Wextra -ffreestanding -nostdlib -fno-stack-protector
+CC = gcc
+AS = nasm
+CFLAGS = -ffreestanding -fno-stack-protector -mno-red-zone -mgeneral-regs-only -Wall -Wextra -Isrc -c
+LDFLAGS = -T linker.ld -nostdlib -Wl,-z,max-page-size=0x1000
 
-TARGET = boot.efi
-SRCS = src/boot.c src/main.c
+OBJS = src/boot.o src/main.o src/gdt.o src/idt.o src/isr.o
 
-all: $(TARGET)
+all: kernel.efi
 
-$(TARGET): $(SRCS)
-	$(CC) $(CFLAGS) -shared -e EfiMain -o $(TARGET) $(SRCS)
+kernel.efi: $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $^
 
-run: $(TARGET)
-	qemu-system-x86_64 -bios /usr/share/ovmf/OVMF.fd -drive format=raw,file=fat:rw:.
+%.o: %.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+%.o: %.asm
+	$(AS) -f elf64 -o $@ $<
 
 clean:
-	rm -f $(TARGET)
+	rm -f src/*.o kernel.efi
